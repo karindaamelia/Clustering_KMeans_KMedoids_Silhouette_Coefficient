@@ -8,7 +8,9 @@ from Utils.Preprocessing import Preprocessing
 def visualize_data(visualization, dataset):
     visualizer = Visualization(dataset)
     
-    if visualization == 'Pairplot':
+    if visualization == 'Histogram Distribution':
+        visualizer.histogram_distribution()
+    elif visualization == 'Pairplot':
         visualizer.pairplot()
     elif visualization == 'Correlation Map':
         visualizer.correlation_map()
@@ -46,7 +48,7 @@ if session_state.dataset_uploaded:
     st.subheader("Visualization")
     visualization = st.selectbox(
         'Select a Visualization',
-        ('None', 'Pairplot', 'Correlation Map')
+        ('None', 'Histogram Distribution', 'Pairplot', 'Correlation Map')
     )
     visualize_data(visualization, dataset)
     

@@ -1,6 +1,7 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import plotly.express as px
 import streamlit as st
 import time
 
@@ -24,7 +25,30 @@ class Visualization:
             return (16, 12)
         else:
             return (18, 14)
+    
+    def histogram_distribution(self):
+        start_time = time.time()
+        numeric_columns = self.get_numeric_features()
+        n_cols = 3  # Jumlah kolom dalam grid
+        n_rows = (len(numeric_columns) + n_cols - 1) // n_cols  # Jumlah baris dalam grid
+        fig, axes = plt.subplots(n_rows, n_cols, figsize=(15, 5 * n_rows))
         
+        for i, feature in enumerate(numeric_columns):
+            row = i // n_cols
+            col = i % n_cols
+            sns.histplot(data=self.dataset, x=feature, kde=True, ax=axes[row, col])
+            axes[row, col].set_title(f'Histogram for {feature}')
+        
+        # Menghapus subplot yang tidak terpakai
+        for i in range(len(numeric_columns), n_rows * n_cols):
+            row = i // n_cols
+            col = i % n_cols
+            fig.delaxes(axes[row, col])
+        
+        plt.tight_layout()
+        st.pyplot()
+        self.computing_time(start_time)
+    
     def pairplot(self):
         start_time = time.time()
         numeric_columns = self.get_numeric_features()
