@@ -10,10 +10,10 @@ def visualize_data(visualization, dataset):
     
     if visualization == 'Histogram Distribution':
         visualizer.histogram_distribution()
+    elif visualization == 'QQ Plot':
+        visualizer.qq_plot()
     elif visualization == 'Pairplot':
         visualizer.pairplot()
-    elif visualization == 'Correlation Map':
-        visualizer.correlation_map()
     elif visualization == 'None':
         # If "None" is selected, there is no need to visualization
         pass
@@ -48,7 +48,7 @@ if session_state.dataset_uploaded:
     st.subheader("Visualization")
     visualization = st.selectbox(
         'Select a Visualization',
-        ('None', 'Histogram Distribution', 'Pairplot', 'Correlation Map')
+        ('None', 'Histogram Distribution', 'QQ Plot', 'Pairplot')
     )
     visualize_data(visualization, dataset)
     

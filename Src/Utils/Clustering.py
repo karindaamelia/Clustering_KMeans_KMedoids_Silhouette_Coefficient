@@ -71,14 +71,17 @@ class Clustering:
         silhouette_avg = silhouette_score(dataset, n_clusters)
         return silhouette_avg
     
+    def count_clusters(self, dataset):
+        # Count the number of occurrences of each cluster label
+        cluster_counts = dataset['Cluster Labels'].value_counts().reset_index()
+        cluster_counts.columns = ['Cluster Label', 'Count']
+        return cluster_counts
+    
     def apply_clustering(self, cluster_type='K-Means', min_clusters=2, max_clusters=10, sample_size=1000, random_state=200):
-        """
-        Melakukan klasterisasi pada dataset menggunakan jumlah cluster terbaik berdasarkan Silhouette Score.
-        """
         # Exclude non-numeric columns from the dataset
         numeric_dataset = self.dataset.select_dtypes(include=[np.number])
         numeric_dataset = numeric_dataset.dropna()  # Drop rows with missing values
-        
+
         # Convert min_clusters and max_clusters to integers
         min_clusters = int(min_clusters)
         max_clusters = int(max_clusters)
@@ -87,16 +90,6 @@ class Clustering:
         # Initialize best silhouette score and number of clusters
         max_silhouette_score = -1
         best_num_clusters = -1
-        
-        # Calculate number of rows and columns for the layout
-        num_rows = (max_clusters - min_clusters + 1) // 2 + ((max_clusters - min_clusters + 1) % 2 > 0)
-        num_cols = 2  # Set to 2 for two columns per row
-
-        # Create layout using columns
-        layout = st.columns(num_cols)
-        
-        # Set larger font size
-        plt.rcParams.update({'font.size': 18})
 
         for i in range(min_clusters, max_clusters + 1):
             if cluster_type == 'K-Means':
@@ -105,7 +98,7 @@ class Clustering:
                 labels = self.kmedoids(numeric_dataset.values, n_clusters=i)
             else:
                 raise ValueError("Invalid cluster_type. Use 'K-Means' or 'K-Medoids'.")
-            
+
             # Update cluster labels to start from 1 and increase sequentially
             labels = labels + 1
 
@@ -115,17 +108,39 @@ class Clustering:
             if silhouette_avg > max_silhouette_score:
                 max_silhouette_score = silhouette_avg
                 best_num_clusters = i
-                
-            # Append silhouette score for later plotting
+
             silhouette_scores.append(silhouette_avg)
-                
+
+        # Plot the silhouette scores
+        plt.figure(figsize=(10, 5))
+        plt.plot(range(min_clusters, max_clusters + 1), silhouette_scores, marker='o')
+        plt.xlabel('Number of Clusters')
+        plt.ylabel('Silhouette Score')
+        plt.title('Silhouette Score vs Number of Clusters')
+        st.pyplot(plt)
+
+        # Initialize layout for silhouette diagrams
+        num_rows = (max_clusters - min_clusters + 1) // 2 + ((max_clusters - min_clusters + 1) % 2 > 0)
+        num_cols = 3
+        layout = st.columns(num_cols)
+
+        # Calculate silhouette diagrams and display
+        for i in range(min_clusters, max_clusters + 1):
+            if cluster_type == 'K-Means':
+                labels = self.kmeans(numeric_dataset.values, n_clusters=i)
+            elif cluster_type == 'K-Medoids':
+                labels = self.kmedoids(numeric_dataset.values, n_clusters=i)
+
+            # Update cluster labels to start from 1 and increase sequentially
+            labels = labels + 1 - labels.min()
+
             # Plot Silhouette diagram
             fig, ax1 = plt.subplots()
             fig.set_size_inches(10, 7)
 
             ax1.set_xlim([-0.1, 1])
             ax1.set_ylim([0, len(numeric_dataset) + (i + 1) * 10])
-            
+
             sample_silhouette_values = silhouette_samples(numeric_dataset, labels)
 
             y_lower = 10
@@ -138,49 +153,41 @@ class Clustering:
                 y_upper = y_lower + size_cluster_j
 
                 color = plt.cm.nipy_spectral(float(j) / i)
-                ax1.fill_betweenx(np.arange(y_lower, y_upper), 0, ith_cluster_silhouette_values, facecolor=color, edgecolor=color, alpha=0.7)
-                
+                ax1.fill_betweenx(np.arange(y_lower, y_upper), 0, ith_cluster_silhouette_values, facecolor=color,
+                                edgecolor=color, alpha=0.7)
+
                 ax1.text(-0.05, y_lower + 0.5 * size_cluster_j, str(j + 1))
                 y_lower = y_upper + 10
 
-            ax1.set_title(f"The silhouette plot for {i} clusters.")
-            ax1.set_xlabel("The silhouette coefficient values")
-            ax1.set_ylabel("Cluster label")
-            
+            ax1.set_title(f"The silhouette plot for {i} clusters.", fontsize=26)
+            ax1.set_xlabel("The silhouette coefficient values", fontsize=22)
+            ax1.set_ylabel("Cluster label", fontsize=22)
+
             # The vertical line for average silhouette score of all the values
-            ax1.axvline(x=silhouette_avg, color="red", linestyle="--")
-            
+            ax1.axvline(x=silhouette_scores[i - min_clusters], color="red", linestyle="--")
+
             ax1.set_yticks([])  # Clear the yaxis labels / ticks
             ax1.set_xticks([-0.1, 0, 0.2, 0.4, 0.6, 0.8, 1])
 
             # Display in columns
             layout[(i - min_clusters) % num_cols].pyplot(fig)
-            st.write(f"Silhouette Score for {i} clusters: {silhouette_avg}")
+            st.write(f"Silhouette Score for {i} clusters: {silhouette_scores[i - min_clusters]}")
 
             # Close the figure to avoid overlapping in the next iteration
             plt.close(fig)
+            
+            # Display best results
+        st.success(f"Best Silhouette Score: {max_silhouette_score} for {best_num_clusters} clusters")
 
         self.best_num_clusters = best_num_clusters
         self.silhouette_score = max_silhouette_score
-        
-        # Plot the silhouette scores
-        st.subheader("Silhouette Score vs Number of Clusters")
-        plt.figure(figsize=(10, 5))
-        plt.plot(range(min_clusters, max_clusters + 1), silhouette_scores, marker='o')
-        plt.xlabel('Number of Clusters')
-        plt.ylabel('Silhouette Score')
-        plt.title('Silhouette Score vs Number of Clusters')
-        st.pyplot(plt)
-        
-        # Display best results
-        st.success(f"Best Silhouette Score: {max_silhouette_score} for {best_num_clusters} clusters")
 
         # Perform clustering with the best number of clusters
         if cluster_type == 'K-Means':
             labels = self.kmeans(numeric_dataset.values, n_clusters=self.best_num_clusters)
         elif cluster_type == 'K-Medoids':
             labels = self.kmedoids(numeric_dataset.values, n_clusters=self.best_num_clusters)
-        
+
         # Update cluster labels to start from 1 and increase sequentially
         labels = labels + 1 - labels.min()
 
@@ -193,7 +200,7 @@ class Clustering:
             medoids = np.array([np.where(labels == i)[0][0] for i in range(1, self.best_num_clusters + 1)])
             distances = np.linalg.norm(numeric_dataset.values[:, np.newaxis, :] - numeric_dataset.values[medoids], axis=-1)
             distance_cols = [f"Distance-{i}" for i in range(1, self.best_num_clusters + 1)]
-        
+
         # Create a new DataFrame with original data, assigned cluster labels, and distances to centroids or medoids
         result_dataset_clustering = pd.concat([numeric_dataset, pd.DataFrame({'Cluster Labels': labels})], axis=1)
         result_dataset_clustering[distance_cols] = pd.DataFrame(distances, index=numeric_dataset.index)
@@ -205,6 +212,11 @@ class Clustering:
         # Display the clustered data in a table
         st.subheader(f'{cluster_type} Clustering (Best Number of Clusters: {self.best_num_clusters})')
         st.dataframe(result_dataset_clustering)
+        
+        # Count cluster occurrences
+        cluster_counts = self.count_clusters(result_dataset_clustering)
+        cluster_counts_sorted = cluster_counts.sort_values(by='Cluster Label')  # Sorting by Cluster Label
+        st.dataframe(cluster_counts_sorted)
         
         # Additional: Calculate cost and display if cluster_type is K-Medoids
         if cluster_type == 'K-Medoids':
