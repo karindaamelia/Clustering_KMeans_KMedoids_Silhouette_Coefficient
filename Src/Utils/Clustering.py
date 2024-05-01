@@ -3,9 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import plotly.express as px
-import sklearn.metrics as metrics
-from sklearn import metrics
 from sklearn.metrics import silhouette_score, silhouette_samples
+
 class Clustering:
     def __init__(self, dataset):
         self.dataset = dataset
@@ -195,11 +194,11 @@ class Clustering:
         if cluster_type == 'K-Means':
             centroids = np.array([numeric_dataset.values[labels == i].mean(axis=0) for i in range(1, self.best_num_clusters + 1)])
             distances = np.linalg.norm(numeric_dataset.values[:, np.newaxis, :] - centroids, axis=-1)
-            distance_cols = [f"Distance-{i}" for i in range(1, self.best_num_clusters + 1)]
+            distance_cols = [f"C{i}" for i in range(1, self.best_num_clusters + 1)]
         elif cluster_type == 'K-Medoids':
             medoids = np.array([np.where(labels == i)[0][0] for i in range(1, self.best_num_clusters + 1)])
             distances = np.linalg.norm(numeric_dataset.values[:, np.newaxis, :] - numeric_dataset.values[medoids], axis=-1)
-            distance_cols = [f"Distance-{i}" for i in range(1, self.best_num_clusters + 1)]
+            distance_cols = [f"C{i}" for i in range(1, self.best_num_clusters + 1)]
 
         # Create a new DataFrame with original data, assigned cluster labels, and distances to centroids or medoids
         result_dataset_clustering = pd.concat([numeric_dataset, pd.DataFrame({'Cluster Labels': labels})], axis=1)

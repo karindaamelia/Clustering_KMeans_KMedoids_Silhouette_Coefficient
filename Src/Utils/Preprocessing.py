@@ -1,10 +1,8 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from scipy.stats import boxcox
 
-from sklearn.preprocessing import LabelEncoder, StandardScaler, MinMaxScaler, RobustScaler, QuantileTransformer, PowerTransformer
-from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import LabelEncoder
 
 class Preprocessing:
     def __init__(self, dataset):
