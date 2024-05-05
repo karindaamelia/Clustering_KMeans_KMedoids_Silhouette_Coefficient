@@ -62,7 +62,7 @@ class Visualization:
             stats.probplot(self.dataset[feature], dist="norm", plot=axes[row, col])
             axes[row, col].set_title(f'QQ Plot for {feature}')
         
-        # Menghapus subplot yang tidak terpakai
+        # Remove unused subplots
         for i in range(len(numeric_columns), n_rows * n_cols):
             row = i // n_cols
             col = i % n_cols
@@ -71,29 +71,6 @@ class Visualization:
         plt.tight_layout()
         st.pyplot()
         self.computing_time(start_time)
-        
-    # def boxplot(self):
-    #     start_time = time.time()
-    #     numeric_columns = self.get_numeric_features()
-    #     n_cols = 2  # Jumlah kolom dalam grid
-    #     n_rows = (len(numeric_columns) + n_cols - 1) // n_cols  # Jumlah baris dalam grid
-    #     fig, axes = plt.subplots(n_rows, n_cols, figsize=(15, 5 * n_rows))
-        
-    #     for i, feature in enumerate(numeric_columns):
-    #         row = i // n_cols
-    #         col = i % n_cols
-    #         sns.boxplot(data=self.dataset, y=feature, ax=axes[row, col])
-    #         axes[row, col].set_title(f'Boxplot for {feature}')
-        
-    #     # Menghapus subplot yang tidak terpakai
-    #     for i in range(len(numeric_columns), n_rows * n_cols):
-    #         row = i // n_cols
-    #         col = i % n_cols
-    #         fig.delaxes(axes[row, col])
-        
-    #     plt.tight_layout()
-    #     st.pyplot()
-    #     self.computing_time(start_time)
     
     def boxplot(self):
         start_time = time.time()
@@ -108,9 +85,9 @@ class Visualization:
             col = i % n_cols
             sns.boxplot(data=self.dataset, x=feature, orient='h', ax=axes[row, col])
             axes[row, col].set_title(f'Boxplot for {feature}')
-            axes[row, col].set_ylabel(feature)  # Atur label sumbu y untuk setiap plot
+            axes[row, col].set_ylabel(feature)  # Set the y-axis labels for each plot
             
-        # Menghapus subplot yang tidak terpakai
+        # Remove unused subplots
         for i in range(n_plots, n_rows * n_cols):
             row = i // n_cols
             col = i % n_cols

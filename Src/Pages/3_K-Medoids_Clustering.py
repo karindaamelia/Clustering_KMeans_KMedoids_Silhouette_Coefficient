@@ -8,7 +8,7 @@ session_state = get_session_state_instance()
 
 st.header("K-Medoids Clustering with Silhouette Coefficent")
 
-# Mendapatkan dataset yang telah diproses dari session state
+# Get the processed dataset from the session state
 preprocessing_dataset = session_state.preprocessing_dataset
 
 # Check if the preprocessing dataset is available in 
