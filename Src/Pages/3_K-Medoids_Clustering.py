@@ -23,4 +23,4 @@ if preprocessing_dataset is not None:
     clustering.apply_clustering(cluster_type='K-Medoids')  
     
 else:
-    st.warning("Preprocessing dataset is not available. Please go back to the Homepage to preprocess the data.")
+    st.warning("Preprocessing dataset is not available. Please go back to the homepage and preprocessing data.")

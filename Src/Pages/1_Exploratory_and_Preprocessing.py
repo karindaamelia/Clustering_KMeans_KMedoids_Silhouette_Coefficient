@@ -69,7 +69,14 @@ if session_state.dataset_uploaded:
     
     # Save the preprocessing dataset to session state
     session_state.preprocessing_dataset = preprocessing.get_preprocessing_dataset()
+    
+    # Check if the dataset is successfully saved to session state
+    if session_state.preprocessing_dataset is not None:
+        st.success("Preprocessing completed and dataset saved to session state.")
+    else:
+        st.error("Error in saving the preprocessed dataset.")
 
 else:
-    session_state.show_no_dataset_warning()
+    # session_state.show_no_dataset_warning()
+    st.warning("Please upload a dataset first on the homepage.")
     

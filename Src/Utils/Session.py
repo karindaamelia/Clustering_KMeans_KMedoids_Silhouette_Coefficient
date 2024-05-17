@@ -11,9 +11,6 @@ class SessionState:
     
     def set_dataset(self, dataset):
         self.dataset = dataset
-    
-    def show_no_dataset_warning(self):
-        st.warning("Please upload a dataset first on the homepage.")
 
 # Singleton pattern to ensure a single instance is used throughout the application
 _session_state_instance = SessionState()

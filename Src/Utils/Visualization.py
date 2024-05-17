@@ -18,14 +18,6 @@ class Visualization:
     def get_numeric_features(self):
         return [col for col in self.dataset.columns if col != 'ID' and pd.api.types.is_numeric_dtype(self.dataset[col])]
     
-    def calculate_figsize(self, num_attributes):
-        if num_attributes <= 5:
-            return (12, 10)
-        elif num_attributes <= 10:
-            return (16, 12)
-        else:
-            return (18, 14)
-    
     def histogram_distribution(self):
         start_time = time.time()
         numeric_columns = self.get_numeric_features()
