@@ -17,6 +17,22 @@ def visualize_data(visualization, dataset):
     elif visualization == 'None':
         # If "None" is selected, there is no need to visualization
         pass
+
+def normalization_data(preprocessing, normalization_option):
+    if normalization_option == 'Min-Max Scaling':
+        preprocessing.normalize(method='minmax')
+    elif normalization_option == 'Z-Score Normalization':
+        preprocessing.normalize(method='zscore')
+    elif normalization_option == 'Robust Scaling':
+        preprocessing.normalize(method='robust')
+    elif normalization_option == 'Power Transformation (Box-Cox)':
+        preprocessing.normalize(method='boxcox')
+    elif normalization_option == 'Power Transformation (Yeo-Johnson)':
+        preprocessing.normalize(method='yeojohnson')
+    elif normalization_option == 'Power Transformation (Exponent=2)':
+        preprocessing.normalize(method='power', exponent=2)
+    elif normalization_option == 'None':
+        pass
         
 if 'selected_features' not in st.session_state:
     st.session_state.selected_features = []
@@ -52,6 +68,13 @@ if session_state.dataset_uploaded:
     )
     visualize_data(visualization, dataset)
     
+    # Selectbox for normalization
+    st.subheader("Normalization")
+    normalization = st.selectbox(
+        'Select Normalization Method',
+        ('None', 'Min-Max Scaling', 'Z-Score Normalization', 'Robust Scaling', 'Power Transformation (Box-Cox)', 'Power Transformation (Yeo-Johnson)', 'Power Transformation (Exponent=2)')
+    )
+    
     # Integrate Preprocessing
     if not hasattr(session_state, 'preprocessing'):
         preprocessing = Preprocessing(dataset)
@@ -62,7 +85,7 @@ if session_state.dataset_uploaded:
     preprocessing.reset(dataset)
     preprocessing.perform_preprocessing() 
     preprocessing.label_encode()
-    preprocessing.power_transformation()
+    normalization_data(preprocessing, normalization)
     preprocessing.select_features()
     preprocessing.rename_attributes()
     preprocessing.display_preprocessing_dataset()

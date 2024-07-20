@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder, StandardScaler, MinMaxScaler, RobustScaler, PowerTransformer, MaxAbsScaler
 
 class Preprocessing:
     def __init__(self, dataset):
@@ -75,11 +75,6 @@ class Preprocessing:
         
         # Update the preprocessing dataset
         self.preprocessing_dataset = encoded_dataset
-            
-    def power_transformation(self, exponent=2):
-        if self.preprocessing_dataset is not None and not self.preprocessing_dataset.empty:
-            transformed_data = self.preprocessing_dataset[self.selected_features].apply(lambda x: np.power(x, exponent))  
-            self.preprocessing_dataset[self.selected_features] = transformed_data
     
     def handle_outliers(self, method='IQR'):
         if self.preprocessing_dataset is not None and not self.preprocessing_dataset.empty:
@@ -90,6 +85,29 @@ class Preprocessing:
                 lower_bound = Q1 - 1.5 * IQR
                 upper_bound = Q3 + 1.5 * IQR
                 self.preprocessing_dataset[self.selected_features] = self.preprocessing_dataset[self.selected_features][~((self.preprocessing_dataset[self.selected_features] < lower_bound) | (self.preprocessing_dataset[self.selected_features] > upper_bound)).any(axis=1)]
+                
+    def normalize(self, method='minmax', exponent=2):
+        if self.preprocessing_dataset is not None and not self.preprocessing_dataset.empty:
+            if method == 'minmax':
+                scaler = MinMaxScaler()
+                self.preprocessing_dataset[self.selected_features] = scaler.fit_transform(self.preprocessing_dataset[self.selected_features])
+            elif method == 'zscore':
+                scaler = StandardScaler()
+                self.preprocessing_dataset[self.selected_features] = scaler.fit_transform(self.preprocessing_dataset[self.selected_features])
+            elif method == 'robust':
+                scaler = RobustScaler()
+                self.preprocessing_dataset[self.selected_features] = scaler.fit_transform(self.preprocessing_dataset[self.selected_features])
+            elif method == 'boxcox':
+                scaler = PowerTransformer(method='box-cox')
+                self.preprocessing_dataset[self.selected_features] = scaler.fit_transform(self.preprocessing_dataset[self.selected_features])
+            elif method == 'yeojohnson':
+                scaler = PowerTransformer(method='yeo-johnson')
+                self.preprocessing_dataset[self.selected_features] = scaler.fit_transform(self.preprocessing_dataset[self.selected_features])
+            elif method == 'power':
+                self.preprocessing_dataset[self.selected_features] = self.preprocessing_dataset[self.selected_features].apply(lambda x: np.power(x, exponent))
+            else:
+                raise ValueError(f"Unknown normalization method: {method}")
+
         
     def perform_preprocessing(self):
         if not self.selected_features:
