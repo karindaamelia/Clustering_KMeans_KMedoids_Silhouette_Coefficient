@@ -21,7 +21,7 @@ class Visualization:
     def histogram_distribution(self):
         start_time = time.time()
         numeric_columns = self.get_numeric_features()
-        n_cols = 2  # Jumlah kolom dalam grid
+        n_cols = 2  # Count of columns in the grid
         n_rows = (len(numeric_columns) + n_cols - 1) // n_cols  # Jumlah baris dalam grid
         fig, axes = plt.subplots(n_rows, n_cols, figsize=(15, 5 * n_rows))
         
@@ -31,20 +31,20 @@ class Visualization:
             sns.histplot(data=self.dataset, x=feature, kde=True, ax=axes[row, col])
             axes[row, col].set_title(f'Histogram for {feature}')
         
-        # Menghapus subplot yang tidak terpakai
+        # Remove unused subplots
         for i in range(len(numeric_columns), n_rows * n_cols):
             row = i // n_cols
             col = i % n_cols
             fig.delaxes(axes[row, col])
         
         plt.tight_layout()
-        st.pyplot()
+        st.pyplot(fig)
         self.computing_time(start_time)
     
     def qq_plot(self):
         start_time = time.time()
         numeric_columns = self.get_numeric_features()
-        n_cols = 2  # Jumlah kolom dalam grid
+        n_cols = 2  # Count of columns in the grid
         n_rows = (len(numeric_columns) + n_cols - 1) // n_cols  # Jumlah baris dalam grid
         fig, axes = plt.subplots(n_rows, n_cols, figsize=(15, 5 * n_rows))
         
@@ -61,7 +61,7 @@ class Visualization:
             fig.delaxes(axes[row, col])
         
         plt.tight_layout()
-        st.pyplot()
+        st.pyplot(fig)
         self.computing_time(start_time)
     
     def boxplot(self):
@@ -86,5 +86,5 @@ class Visualization:
             fig.delaxes(axes[row, col])
         
         plt.tight_layout()
-        st.pyplot()
+        st.pyplot(fig)
         self.computing_time(start_time)
