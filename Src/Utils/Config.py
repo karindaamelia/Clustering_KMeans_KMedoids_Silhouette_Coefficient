@@ -9,7 +9,11 @@ class Config:
     
     @staticmethod
     def disable_pyplot_warning():
-        st.set_option('deprecation.showPyplotGlobalUse', False)
+        # Menghapus atau memberikan try-except pada opsi konfigurasi yang tidak valid
+        try:
+            st.set_option('deprecation.showPyplotGlobalUse', False)
+        except Exception as e:
+            print(f"Warning: {e}")
     
     @staticmethod
     def set_global_config():
